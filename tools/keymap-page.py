@@ -45,8 +45,9 @@ KEY_COUNT = 76
 LAYER_META = [
     {"name": "Base", "accent": "--l0", "led": "off",
      "blurb": "Nothing held. Brackets come from the combos drawn between the "
-              "keys; the inner columns either side of T and Y are deliberately "
-              "dead."},
+              "keys, which is why no key carries one. The left inner column "
+              "holds Esc over the nav layer; the right one repeats the last "
+              "key."},
     {"name": "Keypad", "accent": "--l1", "led": "white",
      "blurb": "Stock Kinesis keypad layer, untouched. Toggled from the key "
               "above 5."},
@@ -62,7 +63,7 @@ LAYER_META = [
               "bootloader to reflash."},
     {"name": "Nav", "accent": "--l4", "led": "red",
      "blurb": "Word and line motions, held with the left index from the inner "
-              "column beside T so the whole right hand is free. Left two go "
+              "column beside G so the whole right hand is free. Left two go "
               "left, right two go right; outer jumps by word, inner by line. "
               "No plain arrows on purpose — those already have dedicated keys "
               "on the base layer."},
