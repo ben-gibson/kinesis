@@ -60,6 +60,12 @@ LAYER_META = [
      "blurb": "Bluetooth profiles, bootloader, battery and backlight. Held "
               "from the key above 6. This is how you get back into the "
               "bootloader to reflash."},
+    {"name": "Nav", "accent": "--l4", "led": "red",
+     "blurb": "Word and line motions, held with the left index from the inner "
+              "column beside T so the whole right hand is free. Left two go "
+              "left, right two go right; outer jumps by word, inner by line. "
+              "No plain arrows on purpose — those already have dedicated keys "
+              "on the base layer."},
 ]
 
 TRANSPARENT = ("&trans",)
