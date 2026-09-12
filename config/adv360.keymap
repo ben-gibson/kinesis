@@ -20,19 +20,120 @@
           flavor = "tap-preferred";
           bindings = <&kp>, <&kp>;
       };
+
+      // Every sticky modifier on this board. Stock &sk drops the modifier when
+      // the NEXT KEY IS RELEASED, so a fast roll after tapping shift capitalises
+      // more than one letter. quick-release drops it on the next key PRESS
+      // instead, which is the whole reason this repo exists.
+      //
+      // quick-release only affects the tapped-and-released path: it is gated on
+      // timer_started, which is set in on_sticky_key_binding_released. Hold one
+      // of these and it behaves like a plain held modifier, so holding Cmd to
+      // walk the app switcher still works.
+      //
+      // ignore-modifiers is what lets two of these chain: tap ctrl, tap shift,
+      // press T and you get Ctrl+Shift+T rather than the ctrl being eaten.
+      skq: sticky_quick {
+          compatible = "zmk,behavior-sticky-key";
+          #binding-cells = <1>;
+          bindings = <&kp>;
+          release-after-ms = <1000>;
+          quick-release;
+          ignore-modifiers;
+          display-name = "Sticky";
+      };
+
+      // Hyper is a window-manager chord, not a typing modifier, so it gets a
+      // longer fuse — you are usually thinking about where the window goes.
+      skh: sticky_hyper {
+          compatible = "zmk,behavior-sticky-key";
+          #binding-cells = <1>;
+          bindings = <&kp>;
+          release-after-ms = <2000>;
+          quick-release;
+          ignore-modifiers;
+          display-name = "Sticky Hyper";
+      };
     };
+
+  // Left hand opens, right hand closes, and the row picks the pair. All six
+  // brackets reached the same way, without shift, without a layer:
+  //
+  //     R+T  (      Y+U  )
+  //     F+G  [      H+J  ]
+  //     V+B  {      N+M  }
+  //
+  // Each pair is two adjacent keys on one row under one flattened index finger,
+  // and no pair crosses the split — cross-half combos are the ones that suffer
+  // latency.
+  //
+  // require-prior-idle-ms is what keeps this safe to type on. R+T is the only
+  // pair that is a common English bigram (start, part, short); prior-idle means
+  // a combo cannot fire if another key went down in the last 125 ms, so a
+  // mid-word roll can never reach it. If ( still misfires, lower timeout-ms
+  // toward 30 before touching prior-idle.
+  combos {
+    compatible = "zmk,combos";
+
+    combo_lpar {
+      key-positions = <18 19>;   // R + T
+      bindings = <&kp LPAR>;
+      timeout-ms = <40>;
+      require-prior-idle-ms = <125>;
+      layers = <0>;
+    };
+    combo_rpar {
+      key-positions = <22 23>;   // Y + U
+      bindings = <&kp RPAR>;
+      timeout-ms = <40>;
+      require-prior-idle-ms = <125>;
+      layers = <0>;
+    };
+    combo_lbkt {
+      key-positions = <32 33>;   // F + G
+      bindings = <&kp LBKT>;
+      timeout-ms = <40>;
+      require-prior-idle-ms = <125>;
+      layers = <0>;
+    };
+    combo_rbkt {
+      key-positions = <40 41>;   // H + J
+      bindings = <&kp RBKT>;
+      timeout-ms = <40>;
+      require-prior-idle-ms = <125>;
+      layers = <0>;
+    };
+    combo_lbrc {
+      key-positions = <50 51>;   // V + B
+      bindings = <&kp LBRC>;
+      timeout-ms = <40>;
+      require-prior-idle-ms = <125>;
+      layers = <0>;
+    };
+    combo_rbrc {
+      key-positions = <54 55>;   // N + M
+      bindings = <&kp RBRC>;
+      timeout-ms = <40>;
+      require-prior-idle-ms = <125>;
+      layers = <0>;
+    };
+  };
 
   keymap {
     compatible = "zmk,keymap";
 
+    // mod3 and mod4 (positions 20 and 21) are deliberately &none. They used to
+    // hold [ and ], which now come from combos; leaving them bound would give
+    // the brackets a second route, and a second route is exactly what stopped
+    // the old symbol layer from ever becoming muscle memory.
     default_layer {
       display-name = "Base";
       bindings = <
-        &kp EQUAL &kp N1    &kp N2   &kp N3   &kp N4     &kp N5 &tog 1                                                           &mo 3 &kp N6 &kp N7 &kp N8    &kp N9   &kp N0   &kp MINUS
-        &kp TAB   &kp Q     &kp W    &kp E    &kp R      &kp T  &none                                                            &none &kp Y  &kp U  &kp I     &kp O    &kp P    &kp BSLH
-        &kp ESC   &kp A     &kp S    &kp D    &kp F      &kp G  &none           &kp LCTRL &kp LALT &kp LGUI  &kp RCTRL           &none &kp H  &kp J  &kp K     &kp L    &kp SEMI &kp SQT
-        &kp LSHFT &kp Z     &kp X    &kp C    &kp V      &kp B                            &kp HOME &kp PG_UP                           &kp N  &kp M  &kp COMMA &kp DOT  &kp FSLH &kp RSHFT
-        &mo 2     &kp GRAVE &kp CAPS &kp LEFT &kp RIGHT                &kp BSPC &kp DEL   &kp END  &kp PG_DN &kp ENTER &kp SPACE              &kp UP &kp DOWN  &kp LBKT &kp RBKT &mo 2
+        &kp EQUAL &kp N1    &kp N2                &kp N3    &kp N4    &kp N5 &tog 1                                                            &mo 3      &kp N6 &kp N7 &kp N8    &kp N9  &kp N0   &kp MINUS
+        &kp TAB   &kp Q     &kp W                 &kp E     &kp R     &kp T  &none                                                             &none      &kp Y  &kp U  &kp I     &kp O   &kp P    &kp BSLH
+        &kp ESC   &kp A     &kp S                 &kp D     &kp F     &kp G  &kp ESC          &skq LCTRL &kp LGUI &kp LGUI  &skq LCTRL         &caps_word &kp H  &kp J  &kp K     &kp L   &kp SEMI &kp SQT
+        &skq LSHFT &kp Z    &kp X                 &kp C     &kp V     &kp B                             &kp HOME &kp PG_UP                                &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH &skq RSHFT
+        &mo 2     &kp GRAVE &skh LS(LC(LA(LGUI))) &skq LALT &skq LGUI                &kp BSPC &kp TAB   &kp END  &kp PG_DN &kp ENTER &kp SPACE            &kp LEFT &kp DOWN &kp UP  &kp RIGHT        &mo 2
       >;
     };
     keypad {
@@ -45,14 +146,28 @@
         &mo 2     &kp GRAVE &kp CAPS &kp LEFT &kp RIGHT                &kp BSPC &kp DEL   &kp END  &kp PG_DN &kp ENTER &kp KP_N0              &kp UP     &kp DOWN     &kp KP_DOT    &kp RBKT        &mo 2
       >;
     };
+    // Media and brightness sit under the right hand, because Fn is held from
+    // either bottom-row corner — hold it with the left pinky and the whole
+    // right hand is free.
+    //
+    // The arrangement is vim motion rather than anything new to learn:
+    // j/k is down/up so it is volume, h/l is left/right so it is track. U and I
+    // are in the same two columns as J and K, so brightness is the same two
+    // fingers one row up. Space is play/pause because Space is always
+    // play/pause.
+    //
+    //          U      I          bri- / bri+
+    //    H     J      K     L     ;
+    //   prev  vol-  vol+  next  mute
+    //          Space = play/pause
     fn {
       display-name = "Fn";
       bindings = <
-        &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6 &tog 1                                           &mo 3 &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12
-        &trans &trans &trans &trans &trans &trans  &none                                           &none &trans &trans &trans &trans  &trans  &trans
-        &trans &trans &trans &trans &trans &trans  &none        &trans &trans &trans &trans        &none &trans &trans &trans &trans  &trans  &trans
-        &trans &trans &trans &trans &trans &trans                      &trans &trans                     &trans &trans &trans &trans  &trans  &trans
-        &trans &trans &trans &trans &trans               &trans &trans &trans &trans &trans &trans              &trans &trans &trans  &trans  &trans
+        &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6 &tog 1                                            &mo 3 &kp F7     &kp F8       &kp F9       &kp F10    &kp F11    &kp F12
+        &trans &trans &trans &trans &trans &trans  &none                                            &none &trans     &kp C_BRI_DN &kp C_BRI_UP &trans     &trans     &trans
+        &trans &trans &trans &trans &trans &trans  &none        &trans &trans &trans &trans         &none &kp C_PREV &kp C_VOL_DN &kp C_VOL_UP &kp C_NEXT &kp C_MUTE &trans
+        &trans &trans &trans &trans &trans &trans                       &trans &trans                     &trans     &trans       &trans       &trans     &trans     &trans
+        &trans &trans &trans &trans &trans               &trans &trans &trans &trans &trans &kp C_PP            &trans &trans &trans  &trans  &trans
       >;
     };
     mod {
@@ -65,23 +180,23 @@
         &none &none        &none        &none        &none                                       &none &none &none &none      &bl BL_TOG &rgb_ug RGB_TOG                                     &bl BL_INC   &bl BL_DEC   &none &none &none
       >;
     };
-    extra1 { 
-      display-name = "Red";    
+    extra1 {
+      display-name = "Red";
       status = "reserved";
     };
 
-    extra2 { 
-      display-name = "Purple";    
+    extra2 {
+      display-name = "Purple";
       status = "reserved";
     };
 
-    extra3 { 
-      display-name = "Cyan";    
+    extra3 {
+      display-name = "Cyan";
       status = "reserved";
     };
 
-    extra4 { 
-      display-name = "Yellow";    
+    extra4 {
+      display-name = "Yellow";
       status = "reserved";
     };
   };
