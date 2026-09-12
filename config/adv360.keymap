@@ -54,6 +54,21 @@
           ignore-modifiers;
           display-name = "Sticky Hyper";
       };
+
+      // Delete had no key at all on the base layer: it was lost when Tab took
+      // the thumb key it used to sit on, and it only survives on the keypad
+      // layer, which is never used. Shift+Backspace is the conventional way to
+      // recover it and it costs no key.
+      //
+      // This pairs with sticky shift rather than fighting it — tap shift, tap
+      // backspace, never holding two keys at once.
+      bspc_del: backspace_delete {
+          compatible = "zmk,behavior-mod-morph";
+          #binding-cells = <0>;
+          bindings = <&kp BSPC>, <&kp DEL>;
+          mods = <(MOD_LSFT|MOD_RSFT)>;
+          display-name = "Bksp / Del";
+      };
     };
 
   // Left hand opens, right hand closes, and the row picks the pair. All six
@@ -134,7 +149,7 @@
         &kp TAB   &kp Q     &kp W                 &kp E     &kp R     &kp T  &mo 4                                                             &key_repeat &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSLH
         &kp ESC   &kp A     &kp S                 &kp D     &kp F     &kp G  &kp ESC          &skq LCTRL &kp LGUI &kp LGUI  &skq LCTRL         &caps_word &kp H  &kp J  &kp K     &kp L   &kp SEMI &kp SQT
         &skq LSHFT &kp Z    &kp X                 &kp C     &kp V     &kp B                             &kp HOME &kp PG_UP                                &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH &skq RSHFT
-        &mo 2     &kp GRAVE &skh LS(LC(LA(LGUI))) &skq LALT &skq LGUI                &kp BSPC &kp TAB   &kp END  &kp PG_DN &kp ENTER &kp SPACE            &kp LEFT &kp DOWN &kp UP  &kp RIGHT        &mo 2
+        &mo 2     &kp GRAVE &skh LS(LC(LA(LGUI))) &skq LALT &skq LGUI                &bspc_del &kp TAB  &kp END  &kp PG_DN &kp ENTER &kp SPACE            &kp LEFT &kp DOWN &kp UP  &kp RIGHT        &mo 2
       >;
     };
     keypad {

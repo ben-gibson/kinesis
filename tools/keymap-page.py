@@ -322,6 +322,12 @@ def render_binding(binding):
         cell["title"] = "%s  —  %s %s" % (binding, STICKY[name], cell["lg"])
         return cell
 
+    if name == "bspc_del":
+        cell["lg"] = "Bksp"
+        cell["kind"] = "mod"
+        cell["title"] = "&bspc_del  —  Backspace, or Delete when shifted"
+        return cell
+
     if name == "key_repeat":
         cell["lg"] = "Rept"
         cell["title"] = "&key_repeat  —  resend the last keycode, modifiers and all"
