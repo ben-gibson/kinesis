@@ -272,6 +272,13 @@ the keymap, behaviours and combos. So for a keymap change the right half has
 nothing to learn. Anything touching ZMK itself or the split protocol does need
 both, or the halves can fail to pair.
 
+**Adding a layer does not change this**, which is worth knowing because it looks
+like it should. The layer indicator LED on the right module keys off the layer
+*number* that crosses the split, and the number-to-colour table is compiled into
+that module's firmware for all 32 layers regardless of how many the keymap
+defines. Confirmed on hardware: the nav layer was added and only the left half
+flashed, and the right module lit red for a layer it had never been told about.
+
 ### Which artifact
 
 Two jobs build on every push, and **both produce files with identical names**,
