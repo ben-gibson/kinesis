@@ -60,6 +60,12 @@ LAYER_META = [
      "blurb": "Bluetooth profiles, bootloader, battery and backlight. Held "
               "from the key above 6. This is how you get back into the "
               "bootloader to reflash."},
+    {"name": "Nav", "accent": "--l4", "led": "red",
+     "blurb": "Word and line motions, held with the left index from the inner "
+              "column beside T so the whole right hand is free. Left two go "
+              "left, right two go right; outer jumps by word, inner by line. "
+              "No plain arrows on purpose — those already have dedicated keys "
+              "on the base layer."},
 ]
 
 TRANSPARENT = ("&trans",)
@@ -314,6 +320,17 @@ def render_binding(binding):
         cell["lg"] = keycode_legend(params[0])
         cell["kind"] = "mod"
         cell["title"] = "%s  —  %s %s" % (binding, STICKY[name], cell["lg"])
+        return cell
+
+    if name == "bspc_del":
+        cell["lg"] = "Bksp"
+        cell["kind"] = "mod"
+        cell["title"] = "&bspc_del  —  Backspace, or Delete when shifted"
+        return cell
+
+    if name == "key_repeat":
+        cell["lg"] = "Rept"
+        cell["title"] = "&key_repeat  —  resend the last keycode, modifiers and all"
         return cell
 
     if name == "caps_word":

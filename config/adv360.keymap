@@ -54,6 +54,21 @@
           ignore-modifiers;
           display-name = "Sticky Hyper";
       };
+
+      // Delete had no key at all on the base layer: it was lost when Tab took
+      // the thumb key it used to sit on, and it only survives on the keypad
+      // layer, which is never used. Shift+Backspace is the conventional way to
+      // recover it and it costs no key.
+      //
+      // This pairs with sticky shift rather than fighting it — tap shift, tap
+      // backspace, never holding two keys at once.
+      bspc_del: backspace_delete {
+          compatible = "zmk,behavior-mod-morph";
+          #binding-cells = <0>;
+          bindings = <&kp BSPC>, <&kp DEL>;
+          mods = <(MOD_LSFT|MOD_RSFT)>;
+          display-name = "Bksp / Del";
+      };
     };
 
   // Left hand opens, right hand closes, and the row picks the pair. All six
@@ -122,18 +137,19 @@
   keymap {
     compatible = "zmk,keymap";
 
-    // mod3 and mod4 (positions 20 and 21) are deliberately &none. They used to
-    // hold [ and ], which now come from combos; leaving them bound would give
-    // the brackets a second route, and a second route is exactly what stopped
-    // the old symbol layer from ever becoming muscle memory.
+    // The two inner columns either side of T and Y used to hold [ and ], which
+    // now come from combos. Leaving them bound would have given the brackets a
+    // second route, and a second route is exactly what stopped the old symbol
+    // layer from becoming muscle memory — so they were blanked, and now carry
+    // the two things that had no home at all: the nav layer and key repeat.
     default_layer {
       display-name = "Base";
       bindings = <
         &kp EQUAL &kp N1    &kp N2                &kp N3    &kp N4    &kp N5 &tog 1                                                            &mo 3      &kp N6 &kp N7 &kp N8    &kp N9  &kp N0   &kp MINUS
-        &kp TAB   &kp Q     &kp W                 &kp E     &kp R     &kp T  &none                                                             &none      &kp Y  &kp U  &kp I     &kp O   &kp P    &kp BSLH
+        &kp TAB   &kp Q     &kp W                 &kp E     &kp R     &kp T  &mo 4                                                             &key_repeat &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSLH
         &kp ESC   &kp A     &kp S                 &kp D     &kp F     &kp G  &kp ESC          &skq LCTRL &kp LGUI &kp LGUI  &skq LCTRL         &caps_word &kp H  &kp J  &kp K     &kp L   &kp SEMI &kp SQT
         &skq LSHFT &kp Z    &kp X                 &kp C     &kp V     &kp B                             &kp HOME &kp PG_UP                                &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH &skq RSHFT
-        &mo 2     &kp GRAVE &skh LS(LC(LA(LGUI))) &skq LALT &skq LGUI                &kp BSPC &kp TAB   &kp END  &kp PG_DN &kp ENTER &kp SPACE            &kp LEFT &kp DOWN &kp UP  &kp RIGHT        &mo 2
+        &mo 2     &kp GRAVE &skh LS(LC(LA(LGUI))) &skq LALT &skq LGUI                &bspc_del &kp TAB  &kp END  &kp PG_DN &kp ENTER &kp SPACE            &kp LEFT &kp DOWN &kp UP  &kp RIGHT        &mo 2
       >;
     };
     keypad {
@@ -180,9 +196,37 @@
         &none &none        &none        &none        &none                                       &none &none &none &none      &bl BL_TOG &rgb_ug RGB_TOG                                     &bl BL_INC   &bl BL_DEC   &none &none &none
       >;
     };
-    extra1 {
-      display-name = "Red";
-      status = "reserved";
+    // Held with the left index from the inner column beside T, so the whole
+    // right hand is free. The board shows a red indicator while it is live.
+    //
+    // No plain arrows here on purpose. They already have dedicated keys on the
+    // base layer, and duplicating them would be the same mistake the symbol
+    // layer made. This layer carries only the motions that have no home at all.
+    //
+    // Left two go left, right two go right; outer jumps by word, inner by line.
+    // Y U I O sit directly above H J K L, so the row above is the same motion
+    // with shift added — select instead of move. Same finger, one row up.
+    //
+    //     Y       U       I       O
+    //    sel     sel     sel     sel        select
+    //    word    line    line    word
+    //
+    //     H       J       K       L       ;       '
+    //    word    line    line    word    del     del      move / delete
+    //     <-      <-      ->      ->     word    line
+    //
+    //     ,       .       /
+    //    zoom    zoom    zoom              , is < and . is > — out and in
+    //    out      in     reset
+    nav {
+      display-name = "Nav";
+      bindings = <
+        &none  &none  &none  &none  &none  &none  &none                                        &none  &none            &none            &none             &none             &none        &none
+        &trans &none  &none  &none  &none  &none  &trans                                       &trans &kp LS(LA(LEFT)) &kp LS(LG(LEFT)) &kp LS(LG(RIGHT)) &kp LS(LA(RIGHT)) &none        &trans
+        &trans &none  &none  &none  &none  &none  &trans       &trans &trans &trans &trans     &none  &kp LA(LEFT)     &kp LG(LEFT)     &kp LG(RIGHT)     &kp LA(RIGHT)     &kp LA(BSPC) &kp LG(BSPC)
+        &trans &none  &none  &none  &none  &none                      &trans &trans                   &none            &none            &kp LG(MINUS)     &kp LG(EQUAL)     &kp LG(N0)   &trans
+        &trans &none  &trans &trans &trans              &trans &trans &trans &trans &trans &trans            &trans &trans &trans  &trans  &trans
+      >;
     };
 
     extra2 {
