@@ -42,8 +42,16 @@ docs — the docs describe mainline.
 
 ## What this changes from stock
 
-Layers 1 (Kp) and 3 (Mod) are untouched. Layer 2 (Fn) keeps its F-keys and gains
-media controls; everything else is on the base layer.
+| # | Layer | Indicator | |
+| --- | --- | --- | --- |
+| 0 | Base | off | brackets on combos, sticky mods, Delete on shifted backspace |
+| 1 | Kp | white | stock Kinesis keypad, untouched |
+| 2 | Fn | blue | F1–F12, plus media and brightness |
+| 3 | Mod | green | stock — Bluetooth, bootloader, battery, backlight |
+| 4 | Nav | red | word and line motions |
+
+Indicator is the colour the board's own layer LED shows, which is the only
+feedback the keyboard gives about which layer is live.
 
 ### Brackets are combos
 
@@ -121,11 +129,55 @@ This is on Fn rather than Mod deliberately. Mod carries `&bootloader` and
 `&bt BT_CLR`; everyday volume does not belong on the same layer as the keys that
 drop your Bluetooth pairing.
 
-### Everything else
+### The nav layer
 
-`&caps_word` at position 39 is the only genuinely new key. It is the partner to
-sticky shift — *one letter* versus *one word* — and `SCREAMING_CASE` had nowhere
-else to live.
+Held with the left index from the inner column beside `G`. Every motion on it is
+one that had no key before, only a two- or three-finger chord. Plain arrows are
+deliberately absent — the base layer already has a dedicated arrow cluster, and
+duplicating it here would be the same mistake the symbol layer made.
+
+```
+  Y      U      I      O          select
+ ⇧⌥←    ⇧⌘←    ⇧⌘→    ⇧⌥→
+
+  H      J      K      L      ;      '     move / delete
+  ⌥←     ⌘←     ⌘→     ⌥→    ⌥⌫     ⌘⌫
+
+                ,      .      /            zoom
+               ⌘-     ⌘=     ⌘0
+```
+
+Left two go left, right two go right; outer jumps by word, inner by line.
+`Y U I O` sit in the same columns as `H J K L`, so **the row above is the same
+motion with shift added** — select rather than move, same finger, one row up.
+That is the one worth having: `⇧⌘←` is awkward as a chord and trivial as a key.
+Zoom uses `,` and `.` because they are `<` and `>`.
+
+Alphas on this layer are `&none` rather than `&trans`, so a mistimed hold cannot
+dump letters into a document. Modifiers, thumbs, Tab/Esc and the base arrows all
+still pass through.
+
+**The key position is on trial.** All three left inner-column keys sit in one
+column; the nav key was moved down to the home row on 2026-09-12, swapping with
+the duplicate Esc, on the principle that a key you *hold* belongs on the home row
+and a key you *tap* can afford the reach. Swap them back to revert.
+
+### Delete, and the repeat key
+
+Delete had no key on the base layer at all — not moved, missing. It was lost when
+Tab took the thumb position it used to occupy and survived only on the keypad
+layer, so in practice the board could not delete forwards. A mod-morph on
+Backspace recovers it for nothing: **Backspace normally, Delete when shifted.**
+It composes with sticky shift rather than fighting it — tap shift, tap
+backspace, never holding two keys.
+
+`&key_repeat`, on the inner column beside `Y`, resends the last keycode *with
+its modifiers*. That turns an awkward chord into one chord plus however many
+cheap taps you need: `⌥⌫` once and three taps deletes four words back.
+
+`&caps_word`, where the symbol layer key used to be, is the partner to sticky
+shift — *one letter* versus *one word* — and `SCREAMING_CASE` had nowhere else
+to live.
 
 ## The layer map page
 
@@ -207,6 +259,41 @@ being the source of truth, silently. Opening Clique to look is fine.
 
 If you ever need the stock layout back, Kinesis publish factory-default firmware
 on the same support page.
+
+### Which half to flash
+
+**Left only when you changed `config/adv360.keymap`. Both halves when you
+changed anything under `config/boards/`, a defconfig, or `west.yml`.**
+
+This is not because the halves sync — nothing is transferred, and the right half
+is simply never updated. In ZMK the peripheral does not process the keymap at
+all; it reports key *positions* over BLE and the left half resolves them against
+the keymap, behaviours and combos. So for a keymap change the right half has
+nothing to learn. Anything touching ZMK itself or the split protocol does need
+both, or the halves can fail to pair.
+
+### Which artifact
+
+Two jobs build on every push, and **both produce files with identical names**,
+so downloading one on top of the other silently overwrites it. Clear the
+directory between downloads.
+
+| Job | Artifact | Left half |
+| --- | --- | --- |
+| `Build (Clique)` | `firmware-clique` | ZMK Studio compiled in |
+| `Build (Legacy)` | `firmware-no-clique` | no Studio |
+
+"Legacy" does not mean outdated — it is Kinesis' word for the original
+repo-based workflow, built from the same commit as the other. This board runs
+the **Clique** build, so Clique can still connect, which is exactly why the
+"never save in Clique" rule above has to be kept by hand rather than being
+enforced. The left half is about 63 KB larger in that build; the right half is
+byte-identical between the two.
+
+Mod+V types the build date, branch and commit, so you can always check what is
+actually running. Flash from a build of the branch you merged to, not of a
+feature branch that is about to be squashed away — otherwise it reports a commit
+that no longer exists.
 
 ## Checking it works
 
