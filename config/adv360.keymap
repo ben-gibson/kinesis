@@ -122,15 +122,16 @@
   keymap {
     compatible = "zmk,keymap";
 
-    // mod3 and mod4 (positions 20 and 21) are deliberately &none. They used to
-    // hold [ and ], which now come from combos; leaving them bound would give
-    // the brackets a second route, and a second route is exactly what stopped
-    // the old symbol layer from ever becoming muscle memory.
+    // The two inner columns either side of T and Y used to hold [ and ],
+    // which now come from combos. Leaving them bound would have given the
+    // brackets a second route, and a second route is exactly what stopped the
+    // old symbol layer from becoming muscle memory. The one beside Y now
+    // carries the repeat key; the one beside T is still free.
     default_layer {
       display-name = "Base";
       bindings = <
         &kp EQUAL &kp N1    &kp N2                &kp N3    &kp N4    &kp N5 &tog 1                                                            &mo 3      &kp N6 &kp N7 &kp N8    &kp N9  &kp N0   &kp MINUS
-        &kp TAB   &kp Q     &kp W                 &kp E     &kp R     &kp T  &none                                                             &none      &kp Y  &kp U  &kp I     &kp O   &kp P    &kp BSLH
+        &kp TAB   &kp Q     &kp W                 &kp E     &kp R     &kp T  &none                                                             &key_repeat &kp Y &kp U  &kp I     &kp O   &kp P    &kp BSLH
         &kp ESC   &kp A     &kp S                 &kp D     &kp F     &kp G  &kp ESC          &skq LCTRL &kp LGUI &kp LGUI  &skq LCTRL         &caps_word &kp H  &kp J  &kp K     &kp L   &kp SEMI &kp SQT
         &skq LSHFT &kp Z    &kp X                 &kp C     &kp V     &kp B                             &kp HOME &kp PG_UP                                &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH &skq RSHFT
         &mo 2     &kp GRAVE &skh LS(LC(LA(LGUI))) &skq LALT &skq LGUI                &kp BSPC &kp TAB   &kp END  &kp PG_DN &kp ENTER &kp SPACE            &kp LEFT &kp DOWN &kp UP  &kp RIGHT        &mo 2

@@ -316,6 +316,11 @@ def render_binding(binding):
         cell["title"] = "%s  —  %s %s" % (binding, STICKY[name], cell["lg"])
         return cell
 
+    if name == "key_repeat":
+        cell["lg"] = "Rept"
+        cell["title"] = "&key_repeat  —  resend the last keycode, modifiers and all"
+        return cell
+
     if name == "caps_word":
         cell["lg"] = "CapsWd"
         cell["kind"] = "mod"
