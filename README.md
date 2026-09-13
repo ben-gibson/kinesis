@@ -246,13 +246,25 @@ the settings partition, and settings **override the keymap compiled into
 firmware**. Flashing a new build onto a board that has ever been saved from
 Clique appears to do nothing at all.
 
-1. Get the **Settings Reset** image from
-   [kinesis-ergo.com/support/kb360pro](https://kinesis-ergo.com/support/kb360pro/#firmware-updates)
-   and follow *their* ordering — it is their procedure, not mine.
+Clearing that saved keymap is all it takes, and Clique can do it itself — no
+reset image, no wiped pairings:
+
+1. Open Clique and hit **Reset to Stock Keymap**. That drops the saved keymap
+   from the settings partition, which is the thing that was shadowing the
+   firmware.
 2. Double-click the reset button on the left module. It mounts as a USB drive.
-   Flash the reset image, then `left.uf2`.
-3. Repeat on the right module with `right.uf2`.
-4. **This wipes Bluetooth pairings.** Expect to re-pair.
+   Copy `left.uf2` onto it.
+3. Repeat on the right module with `right.uf2` — only when the change needs it,
+   see below.
+
+Confirmed on hardware: reset to stock in Clique, flashed `left.uf2`, and the
+build came up as expected — nothing needed re-pairing.
+
+The **Settings Reset** image on
+[kinesis-ergo.com/support/kb360pro](https://kinesis-ergo.com/support/kb360pro/#firmware-updates)
+is the heavier fallback if a board is wedged in some other way — flash it, then
+`left.uf2`, following *their* ordering, and expect to re-pair Bluetooth
+afterwards. It has not been needed here.
 
 Then, permanently: **do not save in Clique again.** One save and this repo stops
 being the source of truth, silently. Opening Clique to look is fine.
