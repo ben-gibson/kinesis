@@ -33,7 +33,7 @@ layer map below possible.
 | Branch           | `V3.0`                                                  |
 | ZMK              | `ReFil/zmk`, revision `adv360-z3.5-2` (a Kinesis fork)  |
 | Boards           | `adv360_left`, `adv360_right` — flashed separately      |
-| Bootloader       | double-click the reset button on the module             |
+| Bootloader       | Mod + the inner column beside `T` (left) or `Y` (right) |
 
 Not base ZMK. Kinesis maintain their own fork for the indicator LEDs and Clique;
 some upstream ZMK features land here late or not at all. Anything you want to
@@ -252,19 +252,25 @@ reset image, no wiped pairings:
 1. Open Clique and hit **Reset to Stock Keymap**. That drops the saved keymap
    from the settings partition, which is the thing that was shadowing the
    firmware.
-2. Double-click the reset button on the left module. It mounts as a USB drive.
-   Copy `left.uf2` onto it.
-3. Repeat on the right module with `right.uf2` — only when the change needs it,
-   see below.
+2. Put the left half in the bootloader: hold **Mod** and press the inner column
+   beside `T`. It mounts as a USB drive. Mod is `&mo 3` on the *right* half, so
+   the right half has to be powered on to reach the key at all — switch it off
+   once the drive has mounted.
+3. Copy `left.uf2` onto the drive.
+4. Right half only when the change needs it, see below: Mod + the inner column
+   beside `Y` puts *that* half in the bootloader, then `right.uf2`.
 
-Confirmed on hardware: reset to stock in Clique, flashed `left.uf2`, and the
-build came up as expected — nothing needed re-pairing.
+Confirmed on hardware: reset to stock in Clique, bootloader from the keymap,
+flashed `left.uf2`, and the build came up as expected — nothing needed
+re-pairing.
 
 The **Settings Reset** image on
 [kinesis-ergo.com/support/kb360pro](https://kinesis-ergo.com/support/kb360pro/#firmware-updates)
 is the heavier fallback if a board is wedged in some other way — flash it, then
 `left.uf2`, following *their* ordering, and expect to re-pair Bluetooth
-afterwards. It has not been needed here.
+afterwards. It has not been needed here. If the keymap route to the bootloader
+is not available either, double-clicking the module's own reset button mounts
+the drive.
 
 Then, permanently: **do not save in Clique again.** One save and this repo stops
 being the source of truth, silently. Opening Clique to look is fine.
